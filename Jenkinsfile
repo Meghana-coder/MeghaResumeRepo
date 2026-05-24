@@ -2,18 +2,19 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "meghana-resume-build"
+        IMAGE_NAME = "meghana1298/meghana-resume"
         IMAGE_TAG = "v${BUILD_NUMBER}"
+        DOCKERHUB_CREDENTIALS = "dockerhub-creds"
+        GIT_REPO = "https://github.com/Meghana-coder/MeghaResumeRepo.git"
     }
 
     stages {
 
-        // stage('Checkout') {
-        //     steps {
-        //         git branch: 'main',
-        //         url: 'https://github.com/Meghana-coder/MeghaResumeRepo.git'
-        //     }
-        // }
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: "${GIT_REPO}"
+            }
+        }
 
         stage('Build Docker Image') {
             steps {
@@ -23,31 +24,44 @@ pipeline {
             }
         }
 
-        stage('Run Docker Container') {
+        stage('Login to DockerHub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIALS}", usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                    sh """
+                    echo $PASS | docker login -u $USER --password-stdin
+                    """
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
             steps {
                 sh """
-                docker stop meghna-resume-container || true
-                docker rm meghna-resume-container || true
-
-                docker run -d \
-                -p 8000:3000 \
-                --name meghna-resume-container \
-                ${IMAGE_NAME}:${IMAGE_TAG}
+                docker push ${IMAGE_NAME}:${IMAGE_TAG}
                 """
             }
         }
 
-        stage('List Images') {
+        stage('Update K8s Manifest (GitOps Trigger)') {
             steps {
-                sh 'docker images'
+                sh """
+                sed -i '' 's|image:.*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g' k8s/deployment.yaml
+
+                git config user.email "jenkins@ci.com"
+                git config user.name "jenkins"
+
+                git add k8s/deployment.yaml
+                git commit -m "Update image to ${IMAGE_TAG}" || echo "No changes"
+                git push origin main
+                """
             }
         }
     }
 
     post {
         success {
-            echo "Pipeline completed successfully"
-            echo "Created image: ${IMAGE_NAME}:${IMAGE_TAG}"
+            echo "CI/CD completed successfully"
+            echo "Image pushed: ${IMAGE_NAME}:${IMAGE_TAG}"
         }
 
         failure {
