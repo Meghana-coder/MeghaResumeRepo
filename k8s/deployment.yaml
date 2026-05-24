@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: resume-app
-        image: meghana-resume-build:latest
-        imagePullPolicy: Never
+        image: meghana-coder/meghana-resume:v3
+        imagePullPolicy: Always
         ports:
         - containerPort: 3000
