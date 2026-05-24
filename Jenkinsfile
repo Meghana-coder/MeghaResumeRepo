@@ -26,10 +26,14 @@ pipeline {
 
         stage('Login to DockerHub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIALS}", usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                    sh """
-                    echo $PASS | docker login -u $USER --password-stdin
-                    """
+                withCredentials([usernamePassword(
+                    credentialsId: "${DOCKERHUB_CREDENTIALS}",
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
+                )]) {
+                    sh '''
+                    echo "$PASS" | docker login -u "$USER" --password-stdin
+                    '''
                 }
             }
         }
@@ -45,7 +49,7 @@ pipeline {
         stage('Update K8s Manifest (GitOps Trigger)') {
             steps {
                 sh """
-                sed -i '' 's|image:.*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g' k8s/deployment.yaml
+                sed -i 's|image:.*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g' k8s/deployment.yaml
 
                 git config user.email "jenkins@ci.com"
                 git config user.name "jenkins"
