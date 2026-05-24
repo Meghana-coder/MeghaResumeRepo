@@ -1,16 +1,16 @@
-pipeline{
-    agent any 
+pipeline {
+    agent any
 
-    stages{
-        
-         stage('Checkout') {
+    stages {
+
+        stage('Checkout') {
             steps {
                 checkout scm
             }
         }
 
-        stage('Build Docker Image'){
-            steps('Build Docker Image'){
+        stage('Build Docker Image') {
+            steps {
                 sh 'docker build -t meghana-resume-build .'
             }
         }
@@ -20,19 +20,19 @@ pipeline{
                 sh '''
                 docker stop meghna-resume-container || true
                 docker rm meghna-resume-container || true
-                docker run -d -p 8000:3000 --name meghna-resume-container meghna-resume
+                docker run -d -p 8000:3000 --name meghna-resume-container meghana-resume-build
                 '''
             }
         }
     }
 
-    post{
-        success{
-            echo 'Pipeline submitted succesfully'
+    post {
+        success {
+            echo 'Pipeline submitted successfully'
         }
 
         failure {
-            echo 'pipeline failed'
+            echo 'Pipeline failed'
         }
     }
 }
