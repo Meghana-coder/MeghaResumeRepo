@@ -12,7 +12,7 @@ pipeline{
             }
         }
 
-        stage('Run Container') {
+        stage('Run Docker Container') {
             steps {
                 sh '''
                 docker stop meghna-resume-container || true
