@@ -9,7 +9,7 @@ pipeline {
             }
         }
 
-        stage('Build Docker Imagee') {
+        stage('Build Docker Image') {
             steps {
                 sh 'docker build -t meghana-resume-build .'
             }
