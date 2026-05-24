@@ -3,12 +3,12 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
-            steps {
-                git branch: 'main',
-                url: 'https://github.com/Meghana-coder/MeghaResumeRepo.git'
-            }
-        }
+        // stage('Checkout') {
+        //     steps {
+        //         git branch: 'main',
+        //         url: 'https://github.com/Meghana-coder/MeghaResumeRepo.git'
+        //     }
+        // }
 
         stage('Build Docker Imagee') {
             steps {
