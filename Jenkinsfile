@@ -5,7 +5,8 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                checkout scm
+                git branch: 'main',
+                url: 'https://github.com/Meghana-coder/MeghaResumeRepo.git'
             }
         }
 
