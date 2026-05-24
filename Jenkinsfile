@@ -48,16 +48,20 @@ pipeline {
 
         stage('Update K8s Manifest (GitOps Trigger)') {
             steps {
-                sh """
-                sed -i 's|image:.*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g' k8s/deployment.yaml
+                withCredentials([usernamePassword(credentialsId: 'github-creds', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
+                    sh """
+                    sed -i 's|image:.*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g' k8s/deployment.yaml
 
-                git config user.email "jenkins@ci.com"
-                git config user.name "jenkins"
+                    git config user.email "jenkins@ci.com"
+                    git config user.name "jenkins"
 
-                git add k8s/deployment.yaml
-                git commit -m "Update image to ${IMAGE_TAG}" || echo "No changes"
-                git push origin main
-                """
+                    git add k8s/deployment.yaml
+                    git commit -m "Update image to ${IMAGE_TAG}" || echo "No changes"
+
+                    git remote set-url origin https://${GIT_USER}:${GIT_PASS}@github.com/Meghana-coder/MeghaResumeRepo.git
+                    git push origin main
+                    """
+                }
             }
         }
     }
