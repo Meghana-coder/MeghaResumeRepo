@@ -2,18 +2,17 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 
 metadata:
-  name:resume-ingress
+  name: resume-ingress
+
 spec:
   rules:
-  -host: resume-local
-
-   http:
-    paths:
-    -path: /
-     pathType: Prefix
-
-     backend:
-        service:
-          name: resume-service
-          port:
-            number: 80
+  - host: resume-local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: resume-service
+            port:
+              number: 80
